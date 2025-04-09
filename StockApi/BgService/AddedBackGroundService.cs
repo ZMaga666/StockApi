@@ -9,11 +9,18 @@ namespace StockApi.BgService
 {
     public class AddedBackGroundService : BackgroundService
     {
+
         private readonly IServiceProvider _serviceProvider;
+
+        public AddedBackGroundService(IServiceProvider serviceProvider)
+        {
+            _serviceProvider = serviceProvider;
+        }
+
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             var options = new ChromeOptions();
-            options.AddArgument("--headless");
+           // options.AddArgument("--headless");
             //options.AddArgument("--incognito");
 
             using var driver = new ChromeDriver(options);
@@ -61,7 +68,7 @@ namespace StockApi.BgService
                                 CompanyName = tr.FindElement(By.CssSelector("td:nth-child(1) sup")).Text,
                                 Price = tr.FindElement(By.CssSelector("td:nth-child(2)")).Text,
                                 PercentageOfChange = tr.FindElement(By.CssSelector("td:nth-child(3) span")).Text,
-                                ChangePrice = tr.FindElement(By.CssSelector("td:nth-child(4) span")).Text
+                                ChangePrice = tr.FindElement(By.CssSelector("td:nth-child(6)")).Text
                             };
 
                             context.stocks.Add(stock);
@@ -76,7 +83,7 @@ namespace StockApi.BgService
                 await context.SaveChangesAsync(stoppingToken);
                 Console.WriteLine("✔ Stocks saved to DB");
 
-                await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken); // 5 dakika bekle
+                await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken); 
                 driver.Navigate().Refresh();
                 await Task.Delay(10000, stoppingToken);
             }
